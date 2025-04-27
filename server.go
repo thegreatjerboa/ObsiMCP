@@ -1,9 +1,13 @@
+/* 
 package main
 
-import "github.com/mark3labs/mcp-go/server"
+import (
+	"obsimcp/tools"
 
+	"github.com/mark3labs/mcp-go/server"
+)
 
-func createServer() {
+func createServer() *server.MCPServer{
     s := server.NewMCPServer(
         "ObsiMCP",
         "1.0.0",
@@ -11,8 +15,12 @@ func createServer() {
         server.WithLogging(),
         server.WithRecovery(),
     )
+
     // add tools
+    noteTools := tools.NewNoteTool()
+    s.AddTool(noteTools.ReadNote())
     
 
-
+    return s
 }
+*/

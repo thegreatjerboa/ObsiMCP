@@ -2,6 +2,7 @@ package tools
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"obsimcp/config"
 	"os"
@@ -13,8 +14,12 @@ import (
 )
 
 type NoteTool interface{
-    // ReadNote() Get Node Content
+    // ReadNote() Get Note Content
     ReadNote() (mcp.Tool, server.ToolHandlerFunc)
+    // ReadNoteByFullPath() Get Note By fullPath
+    ReadNoteByFullPath() (mcp.Tool, server.ToolHandlerFunc)
+    // GetNoteFullPath() Get Note Full Path by FileName
+    GetNoteFullPath() (mcp.Tool, server.ToolHandlerFunc)
 }
 
 type noteTool struct{
@@ -25,13 +30,15 @@ func NewNoteTool() NoteTool{
     return &noteTool{}
 }
 
+// Read the contents of a file based on its relative path (relative to the Obsidian Vault Path)
 func (n *noteTool) ReadNote() (tool mcp.Tool, handler server.ToolHandlerFunc) {
     tool = mcp.NewTool(
         "ReadNote",
         mcp.WithDescription("Read content from a obsidian markdown file"),
-        mcp.WithString("file_path",
+        mcp.WithString(
+            "file_path",
             mcp.Required(),
-            mcp.Description("Relative path to the file under the vault(e.g., 'subfolder/note.md')"),
+            mcp.Description("Relative path to the file under the vault(e.g. 'subfolder/note.md')"),
         ),
     )
 
@@ -39,7 +46,7 @@ func (n *noteTool) ReadNote() (tool mcp.Tool, handler server.ToolHandlerFunc) {
         relativePath := request.Params.Arguments["file_path"].(string)
         // VaultPath is set in config
         fullPath := filepath.Join(config.Cfg.Vault.Path, relativePath)
-
+        // fullPath := filepath.Join("/Users/iamleizz/study/PersonalKnowledgeBase", relativePath)
         // Make sure the final path is still under vault
         if !strings.HasPrefix(fullPath, config.Cfg.Vault.Path) {
             return mcp.NewToolResultError("Access denied: invalid path"), nil
@@ -64,4 +71,85 @@ func (n *noteTool) ReadNote() (tool mcp.Tool, handler server.ToolHandlerFunc) {
     }
 
     return
+}
+
+// Read Note By fullPath
+func (n *noteTool) ReadNoteByFullPath() (tool mcp.Tool, handler server.ToolHandlerFunc) {
+    tool = mcp.NewTool(
+        "ReadNoteByFullPath",
+        mcp.WithDescription("Read content from a obsidian markdown file by fullPath"),
+        mcp.WithString(
+            "file_full_path",
+            mcp.Required(),
+            mcp.Description("The full file path including vaultpath（e.g. vaultpath/file_name)"),
+        ),
+    )
+
+    handler = func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+        // Check is a file exists
+        fullPath := request.Params.Arguments["file_full_path"].(string)
+        fi, err := os.Stat(fullPath)
+        if err != nil {
+            return mcp.NewToolResultError(fmt.Sprintf("Error accessing file: %v", err)), nil
+        }
+        if fi.IsDir() {
+            return mcp.NewToolResultError("The path is a directory, not a file"), nil
+        }
+
+        // Read file
+        data, err := os.ReadFile(fullPath)
+        if err != nil {
+            return mcp.NewToolResultError(fmt.Sprintf("Error reading file: %v", err)), nil
+        }
+
+        return mcp.NewToolResultText(string(data)), nil
+    }
+
+    return 
+}
+
+// Get the full path of a file by its file name
+func (n *noteTool) GetNoteFullPath()(tool mcp.Tool, handler server.ToolHandlerFunc) {
+    tool = mcp.NewTool(
+        "GetNoteFullPath",
+        mcp.WithDescription("Get the full path of a file by its file name"),
+        mcp.WithString(
+            "file_name",
+            mcp.Required(),
+            mcp.Description("The file name to search for (without the .md extension)"),
+        ),
+    )
+
+    handler = func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+        name, _ := request.Params.Arguments["file_name"].(string)
+        var matches []string
+
+
+        err := filepath.Walk(config.Cfg.Vault.Path, func(path string, info os.FileInfo, err error) error {
+            if err != nil {
+                return err
+            }
+
+            if !info.IsDir() && strings.TrimSuffix(info.Name(), ".md") == name {
+                matches = append(matches, path)
+            }
+
+            return nil
+        })
+
+        if err != nil {
+            return nil, err
+        }
+        
+        jsonData, err := json.Marshal(map[string]interface{}{
+            "matches": matches,
+        })
+        if err != nil {
+            return nil, err
+        }
+
+        return mcp.NewToolResultText(string(jsonData)), nil
+    }
+
+    return 
 }

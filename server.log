@@ -1,0 +1,2 @@
+{"level":"info","ts":1745717746.595237,"caller":"ObsiMCP/main-dev.go:48","msg":"Starting ObsiMCP server..."}
+{"level":"error","ts":1745717748.074965,"caller":"ObsiMCP/main-dev.go:56","msg":"Server error","error":"context canceled","stacktrace":"main.main\n\t/Users/iamleizz/workspace/localwork/golang/ObsiMCP/main-dev.go:56\nruntime.main\n\t/usr/local/go/src/runtime/proc.go:272"}
