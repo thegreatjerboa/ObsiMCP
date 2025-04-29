@@ -20,7 +20,7 @@ type NoteTool interface{
     ReadNoteByFullPath() (mcp.Tool, server.ToolHandlerFunc)
     // GetNoteFullPath() Get Note Full Path by FileName
     GetNoteFullPath() (mcp.Tool, server.ToolHandlerFunc)
-    // WriteNoteByFullPath()
+    // WriteNoteByFullPath() Write A Note By File Full Path(include vault path)
     WriteNoteByFullPath() (mcp.Tool, server.ToolHandlerFunc)
     // CreateANote() Create A Note By FullPath
     CreateANote() (mcp.Tool, server.ToolHandlerFunc)

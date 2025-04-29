@@ -39,6 +39,7 @@ func createServer() *server.MCPServer{
     )
 
     // add tools
+    // nopte tools
     noteTools := tools.NewNoteTool()
     s.AddTool(noteTools.ReadNote())
     s.AddTool(noteTools.GetNoteFullPath())
@@ -46,6 +47,9 @@ func createServer() *server.MCPServer{
     s.AddTool(noteTools.WriteNoteByFullPath())
     s.AddTool(noteTools.CreateANote())
     
+    // folder tools
+    folderTools := tools.NewFolderTools()
+    s.AddTool(folderTools.FindAllFolderByName())
 
     return s
 }

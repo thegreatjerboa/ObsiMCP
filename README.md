@@ -6,3 +6,6 @@
 - 向一个存在的文件中写入内容（支持追加写和覆盖写）（给定文件名，会索引出所有同名文件，然后供用户选择）
 ![alt text](assets/writenote1.png)
 ![alt text](assets/writenote2.png)
+- 支持主动创建文件
+- ![alt text](assets/createnote1.png)
+- ![alt text](assets/createnote2.png)
