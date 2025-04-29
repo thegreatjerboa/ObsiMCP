@@ -38,11 +38,11 @@ func NewNoteTool() NoteTool{
 func (n *noteTool) ReadNote() (tool mcp.Tool, handler server.ToolHandlerFunc) {
     tool = mcp.NewTool(
         "ReadNote",
-        mcp.WithDescription("Read content from a obsidian markdown file"),
+        mcp.WithDescription(`Read content from a obsidian markdown file`),
         mcp.WithString(
             "file_path",
             mcp.Required(),
-            mcp.Description("Relative path to the file under the vault(e.g. 'subfolder/note.md')"),
+            mcp.Description(`Relative path to the file under the vault(e.g. 'subfolder/note.md')`),
         ),
     )
 
@@ -81,11 +81,12 @@ func (n *noteTool) ReadNote() (tool mcp.Tool, handler server.ToolHandlerFunc) {
 func (n *noteTool) ReadNoteByFullPath() (tool mcp.Tool, handler server.ToolHandlerFunc) {
     tool = mcp.NewTool(
         "ReadNoteByFullPath",
-        mcp.WithDescription("Read content from a obsidian markdown file by fullPath"),
+        mcp.WithDescription(`Read content from a obsidian markdown file by fullPath.
+                            -file_full_path: Note Full Path`),
         mcp.WithString(
             "file_full_path",
             mcp.Required(),
-            mcp.Description("The full file path including vaultpath（e.g. vaultpath/file_name)"),
+            mcp.Description(`The full file path including vaultpath（e.g. vaultpath/file_name)`),
         ),
     )
 
@@ -116,12 +117,13 @@ func (n *noteTool) ReadNoteByFullPath() (tool mcp.Tool, handler server.ToolHandl
 func (n *noteTool) GetNoteFullPath()(tool mcp.Tool, handler server.ToolHandlerFunc) {
     tool = mcp.NewTool(
         "GetNoteFullPath",
-        mcp.WithDescription(`According to the Note file name provided by the user, find all files named with the file and the corresponding path in the Obsidian Note Library for the user to select.
-- file_name: The note file name specified by the user`),
+        mcp.WithDescription(`According to the Note file name provided by the user, find all files named with the file and the corresponding 
+                            path in the Obsidian Note Library for the user to select.
+                            - file_name: The note file name specified by the user`),
         mcp.WithString(
             "file_name",
             mcp.Required(),
-            mcp.Description("The file name to search for (without the .md extension)"),
+            mcp.Description(`The file name to search for (without the .md extension)`),
         ),
     )
 
@@ -164,20 +166,23 @@ func (n *noteTool) WriteNoteByFullPath() (tool mcp.Tool, handler server.ToolHand
     // 传入三个参数，完整地址，内容以及写的方式（追加写 or 覆盖写）
     tool = mcp.NewTool(
         "WriteNoteByFullPath",
-        mcp.WithDescription("Write the content according to the full path of the Note"),
+        mcp.WithDescription(`Write content to the Note according to the full path of the Note (including the Vault path). 
+                            The writing method is append or overwrite. The default is append.
+                            -file_full_path: The full path to the file to be written`),
         mcp.WithString(
             "file_full_path",
             mcp.Required(),
-            mcp.Description("First, you need to search for the corresponding complete file path according to the file name, and then write the content according to the complete file path"),
+            mcp.Description(`First, you need to search for the corresponding complete file path according to the file name, 
+            and then write the content according to the complete file path`),
         ),
         mcp.WithString(
             "content",
             mcp.Required(),
-            mcp.Description("What needs to be written"),
+            mcp.Description(`What needs to be written`),
         ),
         mcp.WithString(
             "mode",
-            mcp.Description("Write mode: append (append) or overwrite (overwrite), the default is append"),
+            mcp.Description(`Write mode: append (append) or overwrite (overwrite), the default is append`),
         ),
     )
 
@@ -233,11 +238,14 @@ func (n *noteTool) WriteNoteByFullPath() (tool mcp.Tool, handler server.ToolHand
 func (n *noteTool) CreateANote() (tool mcp.Tool, handler server.ToolHandlerFunc) {
     tool = mcp.NewTool(
         "CrateANote",
-        mcp.WithDescription("Create a note by fullPath"),
+        mcp.WithDescription(`Create a Note according to the full path. 
+                            Note that this server only creates a Note and does not write content to it. 
+                            To write content, you need to call the server that writes content.
+                            -target_file_path: The full path of the Note being created`),
         mcp.WithString(
             "target_file_path",
             mcp.Required(),
-            mcp.Description("The full path(including the vault path) to the file to be created (e.g. /vault/abc/def/xxx.md)"),
+            mcp.Description(`The full path(including the vault path) to the file to be created (e.g. /vault/abc/def/xxx.md)`),
         ),
     )
 
