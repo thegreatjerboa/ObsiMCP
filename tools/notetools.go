@@ -15,7 +15,7 @@ import (
 
 type NoteTool interface{
     // eadNote() Get Note Content
-    ReadNote() (mcp.Tool, server.ToolHandlerFunc)
+    // ReadNote() (mcp.Tool, server.ToolHandlerFunc)
     // ReadNoteByFullPath() Get Note By fullPath
     ReadNoteByFullPath() (mcp.Tool, server.ToolHandlerFunc)
     // GetNoteFullPath() Get Note Full Path by FileName
@@ -24,6 +24,8 @@ type NoteTool interface{
     WriteNoteByFullPath() (mcp.Tool, server.ToolHandlerFunc)
     // CreateANote() Create A Note By FullPath
     CreateANote() (mcp.Tool, server.ToolHandlerFunc)
+    // DeleteNote() Delete A Note By FullPath
+    DeleteNote() (mcp.Tool, server.ToolHandlerFunc)
 }
 
 type noteTool struct{
@@ -34,6 +36,7 @@ func NewNoteTool() NoteTool{
     return &noteTool{}
 }
 
+/*
 // Read the contents of a file based on its relative path (relative to the Obsidian Vault Path)
 func (n *noteTool) ReadNote() (tool mcp.Tool, handler server.ToolHandlerFunc) {
     tool = mcp.NewTool(
@@ -76,6 +79,7 @@ func (n *noteTool) ReadNote() (tool mcp.Tool, handler server.ToolHandlerFunc) {
 
     return
 }
+*/
 
 // Read Note By fullPath
 func (n *noteTool) ReadNoteByFullPath() (tool mcp.Tool, handler server.ToolHandlerFunc) {
@@ -119,7 +123,7 @@ func (n *noteTool) GetNoteFullPath()(tool mcp.Tool, handler server.ToolHandlerFu
         "GetNoteFullPath",
         mcp.WithDescription(`According to the Note file name provided by the user, find all files named with the file and the corresponding 
                             path in the Obsidian Note Library for the user to select.
-                            - file_name: The note file name specified by the user`),
+                            -file_name: The note file name specified by the user`),
         mcp.WithString(
             "file_name",
             mcp.Required(),
@@ -168,7 +172,10 @@ func (n *noteTool) WriteNoteByFullPath() (tool mcp.Tool, handler server.ToolHand
         "WriteNoteByFullPath",
         mcp.WithDescription(`Write content to the Note according to the full path of the Note (including the Vault path). 
                             The writing method is append or overwrite. The default is append.
-                            -file_full_path: The full path to the file to be written`),
+                            -file_full_path: The full path to the file to be written
+                            -content: What needs to be written
+                            -mode: Write mode: append or overwrite. When the user does not explicitly specify to overwrite, 
+                            append is used by default.`),
         mcp.WithString(
             "file_full_path",
             mcp.Required(),
@@ -182,7 +189,8 @@ func (n *noteTool) WriteNoteByFullPath() (tool mcp.Tool, handler server.ToolHand
         ),
         mcp.WithString(
             "mode",
-            mcp.Description(`Write mode: append (append) or overwrite (overwrite), the default is append`),
+            mcp.Description(`Write mode: append or overwrite. 
+                            When the user does not explicitly specify to overwrite, append is used by default.`),
         ),
     )
 
@@ -210,12 +218,12 @@ func (n *noteTool) WriteNoteByFullPath() (tool mcp.Tool, handler server.ToolHand
         }
 
         switch mode{
-        case "append":
+        case "overwrite":
             err := os.WriteFile(file_full_path, []byte(content), 0644)
             if err != nil {
                 return mcp.NewToolResultError("Failed to write note"), err
             }
-        case "overwrite":
+        case "append":
             f, err := os.OpenFile(file_full_path, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
             if err != nil {
                 return mcp.NewToolResultError("Failed to open note"), err
@@ -241,7 +249,11 @@ func (n *noteTool) CreateANote() (tool mcp.Tool, handler server.ToolHandlerFunc)
         mcp.WithDescription(`Create a Note according to the full path. 
                             Note that this server only creates a Note and does not write content to it. 
                             To write content, you need to call the server that writes content.
-                            -target_file_path: The full path of the Note being created`),
+                            Note: Before calling this method, if the Note being created is not under the Vault root directory, 
+                            you need to call other methods to find all directories with the same name as the directory 
+                            where the Note is located, and return them to the user for selection 
+                            (if there is only one directory, it can be created directly).
+                            -target_file_path: The full path of the Note being created.`),
         mcp.WithString(
             "target_file_path",
             mcp.Required(),
@@ -274,3 +286,57 @@ func (n *noteTool) CreateANote() (tool mcp.Tool, handler server.ToolHandlerFunc)
 
     return
 }
+
+// DeleteNote
+func (n *noteTool) DeleteNote() (tool mcp.Tool, handler server.ToolHandlerFunc) {
+    tool = mcp.NewTool(
+        "DeleteNote",
+        mcp.WithDescription(`Given a full path to a Note, delete the Note. Note: This is a dangerous operation, 
+                            please confirm the file path to be deleted with the user before calling this server.`),
+        mcp.WithString(
+            "target_file_path",
+            mcp.Required(),
+            mcp.Description(`The full path(including the vault path) to the file to be delete (e.g. /vault/abc/def/xxx.md)`),
+        ),
+    )
+
+    handler = func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+        target_file_path := request.Params.Arguments["target_file_path"].(string)
+
+        // check IllegalPath
+        if !strings.HasPrefix(target_file_path, config.Cfg.Vault.Path) {
+            return mcp.NewToolResultError("IllegalPath"), nil
+        }
+        
+        // check is .md
+        if !strings.HasSuffix(target_file_path, ".md") {
+            return mcp.NewToolResultError("Not a markdown file"), nil
+        }
+
+        // check path exist
+        if _, err := os.Stat(target_file_path); os.IsNotExist(err) {
+            return mcp.NewToolResultError("File not exist"), nil
+        }
+
+        if err := os.Remove(target_file_path); err != nil {
+            return mcp.NewToolResultError(fmt.Sprintf("Failed to delete note: %v", err)), nil
+        }
+
+        return mcp.NewToolResultText(fmt.Sprintf("Note '%s' delete successfully", target_file_path)), nil
+    }
+
+    return
+}
+
+
+
+
+
+
+
+
+
+
+
+
+

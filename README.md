@@ -7,5 +7,8 @@
 ![alt text](assets/writenote1.png)
 ![alt text](assets/writenote2.png)
 - 支持主动创建文件
-- ![alt text](assets/createnote1.png)
-- ![alt text](assets/createnote2.png)
+![alt text](assets/createnote1.png)
+![alt text](assets/createnote2.png)
+- 支持删除文件
+![alt text](assets/deletenode1.png)
+![alt text](assets/deletenode2.png)
