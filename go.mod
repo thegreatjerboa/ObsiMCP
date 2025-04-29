@@ -5,7 +5,6 @@ go 1.23.2
 require (
 	github.com/mark3labs/mcp-go v0.23.1
 	github.com/spf13/viper v1.20.1
-	go.uber.org/zap v1.27.0
 )
 
 require (
