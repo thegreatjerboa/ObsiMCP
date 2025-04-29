@@ -26,6 +26,8 @@ type NoteTool interface{
     CreateANote() (mcp.Tool, server.ToolHandlerFunc)
     // DeleteNote() Delete A Note By FullPath
     DeleteNote() (mcp.Tool, server.ToolHandlerFunc)
+    // GetNoteList
+    GetNoteList() (mcp.Tool, server.ToolHandlerFunc)
 }
 
 type noteTool struct{
@@ -328,9 +330,62 @@ func (n *noteTool) DeleteNote() (tool mcp.Tool, handler server.ToolHandlerFunc) 
     return
 }
 
+func (n *noteTool) GetNoteList() (tool mcp.Tool, handler server.ToolHandlerFunc) {
 
+    tool = mcp.NewTool(
+        "GetNoteList",
+        mcp.WithDescription(`Given a full path to a folder, get the note file name and folder name in the folder and return it.`),
+        mcp.WithString(
+            "folder_path",
+            mcp.Required(),
+            mcp.Description(`The full path to the folder where all notes need to be listed (including the Vault path (e.g. /vault/aaa/bbb))`),
+        ),
+    )
 
+    handler = func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+        folder_path := request.Params.Arguments["folder_path"].(string)
 
+        // check IllegalPath
+        if !strings.HasPrefix(folder_path, config.Cfg.Vault.Path) {
+                return mcp.NewToolResultError("IllegalPath"), nil
+        }
+        
+        fi, err := os.Stat(folder_path)
+        if err != nil {
+            return mcp.NewToolResultError("Folder not found"), nil
+        }
+
+        if !fi.IsDir() {
+            return mcp.NewToolResultError("Path is not a folder"), nil
+        }
+        
+        entries, err := os.ReadDir(folder_path)
+        if err != nil {
+            return mcp.NewToolResultError("Failed to read folder"), err
+        }
+        var result []map[string]interface{}
+
+        for _, entry := range entries {
+            item := map[string]interface{}{
+                "name":    entry.Name(),
+                "is_dir":  entry.IsDir(),
+            }
+            result = append(result, item)
+        }
+        
+        jsondata, err := json.Marshal(map[string]interface{}{
+            "entries": result,
+        })
+
+        if err != nil {
+            return mcp.NewToolResultError("Json Marshal Failed"), err
+        }
+
+        return mcp.NewToolResultText(string(jsondata)), nil
+    }
+    
+    return
+}
 
 
 

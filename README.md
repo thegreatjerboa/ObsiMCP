@@ -10,5 +10,7 @@
 ![alt text](assets/createnote1.png)
 ![alt text](assets/createnote2.png)
 - 支持删除文件
-![alt text](assets/deletenode1.png)
-![alt text](assets/deletenode2.png)
+![alt text](assets/deletenote1.png)
+![alt text](assets/deletenote2.png)
+- 支持获取某个 folder 下的所有文件和文件夹
+![alt text](assets/getnotelist1.png)
