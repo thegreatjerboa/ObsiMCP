@@ -244,12 +244,12 @@ func (n *noteTool) CreateANote() (tool mcp.Tool, handler server.ToolHandlerFunc)
     handler = func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
         target_file_path := request.Params.Arguments["target_file_path"].(string)
         
-        // check path is a IllegalPath?
+        // check IllegalPath
         if !filepath.HasPrefix(target_file_path, config.Cfg.Vault.Path) {
             return mcp.NewToolResultError("IllegalPath"), nil
         }
         
-        // check path is exist?
+        // check path exist
         if _, err := os.Stat(target_file_path); err == nil {
             return mcp.NewToolResultError("file already exist"), err
         }
