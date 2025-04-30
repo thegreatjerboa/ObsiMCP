@@ -1,16 +1,74 @@
 # ObsiMCP
 
-## 现在已经支持以下功能
-- 指定文件名读取文件
-- 通过文件名检索出所有同名文件
-- 向一个存在的文件中写入内容（支持追加写和覆盖写）（给定文件名，会索引出所有同名文件，然后供用户选择）
-![alt text](assets/writenote1.png)
-![alt text](assets/writenote2.png)
-- 支持主动创建文件
-![alt text](assets/createnote1.png)
-![alt text](assets/createnote2.png)
-- 支持删除文件
-![alt text](assets/deletenote1.png)
-![alt text](assets/deletenote2.png)
-- 支持获取某个 folder 下的所有文件和文件夹
-![alt text](assets/getnotelist1.png)
+A lightweight, extendable MCP server for automating operations on Obsidian vaults, powered by [mcp-go](https://github.com/mark3labs/mcp-go).
+
+This server enables LLM to better help you operate Obsidian and build a knowledge base more conveniently.
+
+
+## ✨ Features
+
+- 📖 **Read a Markdown note**
+- 🔍 **Search all notes with the same file name** across the entire vault.
+- ✍️ **Write content to an existing note**, supporting both:
+  - `append` mode (adds to the end)
+  - `overwrite` mode (replaces the file content)
+- 🆕 **Create a new note**
+- 🗑️ **Delete a note**
+- 📁 **List files and subfolders** within a given folder (non-recursive).
+- ...
+
+
+## 🚀 Getting Started
+
+```bash
+git clone https://github.com/IAMLEIzZ/ObsiMCP.git
+cd obsidian-mcp-server
+go build -o main main.go
+// go run main.go
+```
+
+Configure your `vault` path via the config/config.yaml file or environment variable as needed.
+
+```
+vault:
+  path: "your osbidian vault path"
+```
+
+
+## 🧠 Use Cases
+
+- Build agents or copilots that understand and modify your notes.
+- Integrate with Obsidian from external apps or LLMs.
+- Automate note maintenance, renaming, or content updates.
+For example, in deepchat you can start it like this
+```
+
+```
+
+## 🛠 Example Tool Definitions
+
+Each tool in the MCP server corresponds to an operation:
+
+| Tool Name                   |                  Description                       |
+|-----------------------------|----------------------------------------------------|
+| `ReadNoteByFullPath`          | Reads content from a given Markdown file.          |
+| `GetNoteFullPath`             | Finds all notes in the vault with a matching name. |
+| `WriteNoteByFullPath`         | Appends or overwrites content in an existing note. |
+| `CreateANote`                 | Creates a new note without initial content.        |
+| `DeleteNote`                  | Deletes a note by its name.                        |
+| `GetNoteList`                 | Lists files and subfolders in a given folder.      |
+| `MoveOneNote`                 | Move a note to another folder.                     |
+| `GetNoteList`                 | Lists files and subfolders in a given folder.      |
+| `FindAllFolderByName`         | Find all folders with the same name in the vault according to the folder name.      |
+| `CreateFolder`                 | Delete a folder with folder name.      |
+| ...                | ...      |
+```
+
+## 📄 License
+
+MIT License. Feel free to use, modify, and contribute!
+
+---
+
+> Made with 💙 for knowledge lovers and second-brain builders.
+

@@ -441,8 +441,3 @@ func (n *noteTool) MoveOneNote() (tool mcp.Tool, hander server.ToolHandlerFunc) 
     return 
 }
 
-
-
-
-
-
