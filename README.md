@@ -34,6 +34,14 @@ vault:
   path: "your osbidian vault path"
 ```
 
+### ⚠️ The BackUpDir Config
+
+**To protect your files, you must set up a backup folder. When you use mcp-server to overwrite or delete, a backup file will be automatically generated to prevent your AI assistant from unstable operation.** (You can manually delete outdated backup files regularly, and we will consider adding an automatic deletion function later.)
+
+```
+backup:
+  path: "your backup dir"
+```
 
 ## 🧠 Use Cases
 
