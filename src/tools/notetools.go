@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"obsimcp/src/config"
+	"obsimcp/src/utils"
 	"os"
 	"path/filepath"
 	"strings"
@@ -223,7 +224,12 @@ func (n *noteTool) WriteNoteByFullPath() (tool mcp.Tool, handler server.ToolHand
 
         switch mode{
         case "overwrite":
-            err := os.WriteFile(file_full_path, []byte(content), 0644)
+            // if overwrite, need backup
+            _, err := utils.Backupfile(file_full_path)
+            if err != nil {
+                return mcp.NewToolResultError("Before overwrite, failed to backup this file"), err
+            }
+            err = os.WriteFile(file_full_path, []byte(content), 0644)
             if err != nil {
                 return mcp.NewToolResultError("Failed to write note"), err
             }
@@ -320,6 +326,11 @@ func (n *noteTool) DeleteNote() (tool mcp.Tool, handler server.ToolHandlerFunc) 
         // check path exist
         if _, err := os.Stat(target_file_path); os.IsNotExist(err) {
             return mcp.NewToolResultError("File not exist"), nil
+        }
+        
+        // before delete note, need backup file
+        if _, err := utils.Backupfile(target_file_path); err != nil {
+            return mcp.NewToolResultError("Before delete file, failed to backup file"), err
         }
 
         if err := os.Remove(target_file_path); err != nil {

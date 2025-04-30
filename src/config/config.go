@@ -13,8 +13,13 @@ type VaultConfig struct{
     Path string `mapstructure:"path"`
 }
 
+type BackuoConfig struct {
+    Path string `mapstructure:"path"`
+}
+
 type Config struct{
     Vault VaultConfig `mapstructure:"vault"`
+    Backup BackuoConfig `mapstructure:"backup"`
 }
 
 var Cfg Config
@@ -27,7 +32,7 @@ func InitConfig() {
     viper.SetConfigName("config-dev")
     viper.SetConfigType("yaml")
     viper.AddConfigPath(dir)
-    viper.AddConfigPath(filepath.Join(dir, "config"))
+    viper.AddConfigPath(filepath.Join(dir, "src/config"))
     viper.AddConfigPath(".") // 再保险一层，当前运行目录
 
     if err := viper.ReadInConfig(); err != nil {
