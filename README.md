@@ -48,9 +48,19 @@ backup:
 - Build agents or copilots that understand and modify your notes.
 - Integrate with Obsidian from external apps or LLMs.
 - Automate note maintenance, renaming, or content updates.
-For example, in deepchat you can start it like this
-```
 
+For example, in deepchat you can start it like this (Please open the file read and write permissions at the same time)
+```
+{
+  "mcpServers": {
+    "ObsiMCP": {
+      "command": "Your The absolute path to your main executable", 
+      "args": [],
+      "shell": false,
+      "env": {}
+    }
+  }
+}
 ```
 
 ## 🛠 Example Tool Definitions

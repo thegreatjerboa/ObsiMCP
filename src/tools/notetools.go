@@ -332,6 +332,7 @@ func (n *noteTool) DeleteNote() (tool mcp.Tool, handler server.ToolHandlerFunc) 
         if _, err := utils.Backupfile(target_file_path); err != nil {
             return mcp.NewToolResultError("Before delete file, failed to backup file"), err
         }
+        
 
         if err := os.Remove(target_file_path); err != nil {
             return mcp.NewToolResultError(fmt.Sprintf("Failed to delete note: %v", err)), nil
