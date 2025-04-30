@@ -6,13 +6,17 @@ import (
 	"obsimcp/config"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/mark3labs/mcp-go/mcp"
 	"github.com/mark3labs/mcp-go/server"
 )
 
 type FolderTools interface{
+    // FindAllFolderByName() According Foolder Name Find All Folder
     FindAllFolderByName() (mcp.Tool, server.ToolHandlerFunc)
+    // CreateFolder()
+    CreateFolder() (mcp.Tool, server.ToolHandlerFunc)
 }
 
 type folderTools struct{
@@ -22,6 +26,41 @@ type folderTools struct{
 func NewFolderTools() FolderTools{
     return &folderTools{}
 }
+
+func (ft *folderTools) CreateFolder() (tool mcp.Tool, handler server.ToolHandlerFunc) {
+    tool = mcp.NewTool(
+        "CreateFolder",
+        mcp.WithDescription(`Create a folder in Vault based on the full path to the folder`),
+        mcp.WithString(
+            "folder_path",
+            mcp.Required(),
+            mcp.Description(`The full path to the folder being created (including the vault path)`),
+        ),
+    )
+
+    handler = func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+        folderPath, _ := request.Params.Arguments["folder_path"].(string)
+        
+        if !strings.HasPrefix(folderPath, config.Cfg.Vault.Path) {
+            return mcp.NewToolResultError("Folder_path is a illegalpath"), nil
+        }
+        
+        if _, err := os.Stat(folderPath); err == nil {
+            return mcp.NewToolResultError("Folder alread exist"), nil
+        }
+
+        err := os.MkdirAll(folderPath, 0755)
+        if err != nil {
+            return mcp.NewToolResultError("Failed to create folder"), err
+        }
+
+        return mcp.NewToolResultText("Create folder successfully"), nil
+    }
+
+    return 
+}
+
+
 
 func (ft *folderTools) FindAllFolderByName() (tool mcp.Tool, handler server.ToolHandlerFunc) {
     tool = mcp.NewTool(

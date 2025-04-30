@@ -16,9 +16,9 @@ import (
 type NoteTool interface{
     // eadNote() Get Note Content
     // ReadNote() (mcp.Tool, server.ToolHandlerFunc)
-    // ReadNoteByFullPath() Get Note By fullPath
+    // ReadNoteByFullPath() Get Note By FullPath
     ReadNoteByFullPath() (mcp.Tool, server.ToolHandlerFunc)
-    // GetNoteFullPath() Get Note Full Path by FileName
+    // GetNoteFullPath() Get Note Full Path By FileName
     GetNoteFullPath() (mcp.Tool, server.ToolHandlerFunc)
     // WriteNoteByFullPath() Write A Note By File Full Path(include vault path)
     WriteNoteByFullPath() (mcp.Tool, server.ToolHandlerFunc)
@@ -26,8 +26,10 @@ type NoteTool interface{
     CreateANote() (mcp.Tool, server.ToolHandlerFunc)
     // DeleteNote() Delete A Note By FullPath
     DeleteNote() (mcp.Tool, server.ToolHandlerFunc)
-    // GetNoteList
+    // GetNoteList() Get All Notes And Folders Under A Folder (non-recursive)
     GetNoteList() (mcp.Tool, server.ToolHandlerFunc)
+    // MoveNote() Move One Note To Rarget Path
+    MoveOneNote() (mcp.Tool, server.ToolHandlerFunc)
 }
 
 type noteTool struct{
@@ -388,7 +390,56 @@ func (n *noteTool) GetNoteList() (tool mcp.Tool, handler server.ToolHandlerFunc)
 }
 
 
+func (n *noteTool) MoveOneNote() (tool mcp.Tool, hander server.ToolHandlerFunc) {
+    tool = mcp.NewTool(
+        "MoveOneNote",
+        mcp.WithDescription(`Move a markdown note file from source path to target path`),
+        mcp.WithString(
+            "source_path",
+            mcp.Required(),
+            mcp.Description(`The full path of the note to move`),
+        ),
+        mcp.WithString(
+            "target_path",
+            mcp.Required(),
+            mcp.Description(`The full path to move the note to`),
+        ),
+    )
 
+    hander = func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+        source_path, _ := request.Params.Arguments["source_path"].(string)
+        target_path, _ := request.Params.Arguments["target_path"].(string)
+        
+        // check is illegalPath
+        if !strings.HasPrefix(source_path, config.Cfg.Vault.Path) || !strings.HasPrefix(target_path, config.Cfg.Vault.Path) {
+            return mcp.NewToolResultError("Sourcepath or targetpath is illegalPath"), nil
+        }
+
+        // check is .md
+		if !strings.HasSuffix(source_path, ".md") || !strings.HasSuffix(target_path, ".md") {
+			return mcp.NewToolResultError("Only .md files can be moved"), nil
+		}
+
+        // check is exist
+		if _, err := os.Stat(source_path); os.IsNotExist(err) {
+			return mcp.NewToolResultError("Source file does not exist"), nil
+		}
+
+        // check target path is exist（if not exist, create it）
+		targetDir := filepath.Dir(target_path)
+		if err := os.MkdirAll(targetDir, 0755); err != nil {
+			return mcp.NewToolResultError("Failed to create target directory"), err
+		}
+        
+        if err := os.Rename(source_path, target_path); err != nil {
+            return mcp.NewToolResultError("Failed to move note"), err
+        }
+
+        return mcp.NewToolResultText(fmt.Sprintf("Move note from %s to %s", source_path, target_path)), nil
+    }
+
+    return 
+}
 
 
 
