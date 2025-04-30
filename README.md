@@ -62,10 +62,11 @@ Each tool in the MCP server corresponds to an operation:
 | `FindAllFolderByName`         | Find all folders with the same name in the vault according to the folder name.      |
 | `CreateFolder`                 | Delete a folder with folder name.      |
 | ...                | ...      |
-```
+
 
 ## 📄 License
 
+```
 MIT License. Feel free to use, modify, and contribute!
 
 ---
