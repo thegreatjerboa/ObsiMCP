@@ -1,8 +1,7 @@
 # ObsiMCP
 
 A lightweight, extendable MCP server for automating operations on Obsidian vaults, powered by [mcp-go](https://github.com/mark3labs/mcp-go).
-
-This server enables LLM to better help you operate Obsidian and build a knowledge base more conveniently.
+ObsiMCP helps you efficiently manage your Obsidian notes and build your own personal knowledge base.
 
 
 ## ✨ Features
@@ -87,6 +86,10 @@ Each tool in the MCP server corresponds to an operation:
 | `AddFrontmatter`                | Add frontmatter information to a note     |
 | `GetNotetags`                |  Add tags to a note     |
 | ...                |  ...     |
+
+## 🔗 References
+- [mcp-go](https://github.com/mark3labs/mcp-go)
+
 
 ## 📄 License
 
