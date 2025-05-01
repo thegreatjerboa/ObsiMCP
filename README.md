@@ -26,7 +26,7 @@ ObsiMCP helps you efficiently manage your Obsidian notes and build your own pers
 
 ```bash
 git clone https://github.com/IAMLEIzZ/ObsiMCP.git
-cd obsidian-mcp-server
+cd ObsiMCP
 go build -o main main.go
 ```
 
