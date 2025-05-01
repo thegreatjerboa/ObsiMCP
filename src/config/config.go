@@ -33,7 +33,7 @@ func InitConfig() {
     _, filename, _, _ := runtime.Caller(0)
     confPath := path.Dir(filename)
     viper.AddConfigPath(confPath)
-    viper.SetConfigName("config-dev")
+    viper.SetConfigName("config")
     viper.SetConfigType("yaml")
     // viper.AddConfigPath("./src/config")
     // viper.AddConfigPath(filepath.Join(dir, "src/config"))

@@ -1,2 +1,5 @@
 vault:
-  path: "path"
+  path: "yout obsidian vault path"
+
+backup:
+  path: "your backup dir"

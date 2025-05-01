@@ -15,8 +15,13 @@ This server enables LLM to better help you operate Obsidian and build a knowledg
 - 🆕 **Create a new note**
 - 🗑️ **Delete a note**
 - 📁 **List files and subfolders** within a given folder (non-recursive).
+- 🏷 Modify, add, and get the frontmatter in Note
 - ...
 
+## 📦 Requirements
+
+- Go 1.20+ (The lower version may work, but I haven't tried it yet.)
+- An initialized Obsidian vault directory
 
 ## 🚀 Getting Started
 
@@ -24,7 +29,6 @@ This server enables LLM to better help you operate Obsidian and build a knowledg
 git clone https://github.com/IAMLEIzZ/ObsiMCP.git
 cd obsidian-mcp-server
 go build -o main main.go
-// go run main.go
 ```
 
 Configure your `vault` path via the config/config.yaml file or environment variable as needed.
@@ -69,25 +73,23 @@ Each tool in the MCP server corresponds to an operation:
 
 | Tool Name                   |                  Description                       |
 |-----------------------------|----------------------------------------------------|
-| `ReadNoteByFullPath`          | Reads content from a given Markdown file.          |
-| `GetNoteFullPath`             | Finds all notes in the vault with a matching name. |
-| `WriteNoteByFullPath`         | Appends or overwrites content in an existing note. |
+| `ReadNote`          | Reads content from a given Markdown file.          |
+| `GetNote`             | Finds all notes in the vault with a matching name. |
+| `WriteNote`         | Appends or overwrites content in an existing note. |
 | `CreateANote`                 | Creates a new note without initial content.        |
-| `DeleteNote`                  | Deletes a note by its name.                        |
+| `DeleteNote`                  | Deletes a note by its name and backup it.                        |
 | `GetNoteList`                 | Lists files and subfolders in a given folder.      |
 | `MoveOneNote`                 | Move a note to another folder.                     |
 | `GetNoteList`                 | Lists files and subfolders in a given folder.      |
 | `FindAllFolderByName`         | Find all folders with the same name in the vault according to the folder name.      |
 | `CreateFolder`                 | Delete a folder with folder name.      |
-| ...                | ...      |
-
+| `GetNoteFrontmatter`                | Get a note frontmatter information      |
+| `AddFrontmatter`                | Add frontmatter information to a note     |
+| `GetNotetags`                |  Add tags to a note     |
+| ...                |  ...     |
 
 ## 📄 License
 
 ```
 MIT License. Feel free to use, modify, and contribute!
-
----
-
-> Made with 💙 for knowledge lovers and second-brain builders.
-
+```

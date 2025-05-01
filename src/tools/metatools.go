@@ -19,7 +19,7 @@ type MetaTools interface{
     // AddFrontmatter() Add Frontmatter Info To A Note
     AddFrontmatter() (tool mcp.Tool, handler server.ToolHandlerFunc)
     // GetNoteTags() Get A Note Tags
-    GetNoteTagsText() (tool mcp.Tool, handler server.ToolHandlerFunc)
+    GetNoteTags() (tool mcp.Tool, handler server.ToolHandlerFunc)
 }
 
 type metaTools struct{
@@ -135,9 +135,9 @@ func (m *metaTools) AddFrontmatter() (tool mcp.Tool, handler server.ToolHandlerF
     return
 }
 
-func (m *metaTools) GetNoteTagsText() (tool mcp.Tool, handler server.ToolHandlerFunc) {
+func (m *metaTools) GetNoteTags() (tool mcp.Tool, handler server.ToolHandlerFunc) {
     tool = mcp.NewTool(
-        "GetNoteTagsText",
+        "GetNoteTags",
         mcp.WithDescription("Extract the 'tags' field from the frontmatter of a markdown note and return as plain text."),
         mcp.WithString("note_path", mcp.Required(), mcp.Description("Full path to the markdown note file")),
     )

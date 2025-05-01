@@ -2,4 +2,4 @@ main-dev.go
 src/config/config-dev.yaml
 .vscode/
 .DS_Store
-
+main

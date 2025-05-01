@@ -13,7 +13,7 @@ func main() {
     // create server
     s := server.CreateServer()
     
-    // Run
+    // Run server with stdio
     if err := server.ServerRunWithStdio(s); err != nil {
         fmt.Printf("Server run failed: %v\n", err)
     }

@@ -17,12 +17,12 @@ import (
 type NoteTool interface{
     // eadNote() Get Note Content
     // ReadNote() (mcp.Tool, server.ToolHandlerFunc)
-    // ReadNoteByFullPath() Get Note By FullPath
-    ReadNoteByFullPath() (mcp.Tool, server.ToolHandlerFunc)
-    // GetNoteFullPath() Get Note Full Path By FileName
-    GetNoteFullPath() (mcp.Tool, server.ToolHandlerFunc)
-    // WriteNoteByFullPath() Write A Note By File Full Path(include vault path)
-    WriteNoteByFullPath() (mcp.Tool, server.ToolHandlerFunc)
+    // ReadNote() Get Note By FullPath
+    ReadNote() (mcp.Tool, server.ToolHandlerFunc)
+    // GetNote() Get Note Full Path By FileName
+    GetNote() (mcp.Tool, server.ToolHandlerFunc)
+    // WriteNote() Write A Note By File Full Path(include vault path)
+    WriteNote() (mcp.Tool, server.ToolHandlerFunc)
     // CreateANote() Create A Note By FullPath
     CreateANote() (mcp.Tool, server.ToolHandlerFunc)
     // DeleteNote() Delete A Note By FullPath
@@ -87,7 +87,7 @@ func (n *noteTool) ReadNote() (tool mcp.Tool, handler server.ToolHandlerFunc) {
 */
 
 // Read Note By fullPath
-func (n *noteTool) ReadNoteByFullPath() (tool mcp.Tool, handler server.ToolHandlerFunc) {
+func (n *noteTool) ReadNote() (tool mcp.Tool, handler server.ToolHandlerFunc) {
     tool = mcp.NewTool(
         "ReadNoteByFullPath",
         mcp.WithDescription(`Read content from a obsidian markdown file by fullPath.
@@ -123,7 +123,7 @@ func (n *noteTool) ReadNoteByFullPath() (tool mcp.Tool, handler server.ToolHandl
 }
 
 // Get the full path of a file by its file name
-func (n *noteTool) GetNoteFullPath()(tool mcp.Tool, handler server.ToolHandlerFunc) {
+func (n *noteTool) GetNote()(tool mcp.Tool, handler server.ToolHandlerFunc) {
     tool = mcp.NewTool(
         "GetNoteFullPath",
         mcp.WithDescription(`According to the Note file name provided by the user, find all files named with the file and the corresponding 
@@ -171,7 +171,7 @@ func (n *noteTool) GetNoteFullPath()(tool mcp.Tool, handler server.ToolHandlerFu
 }
 
 // Write the content according to the full path of the Note
-func (n *noteTool) WriteNoteByFullPath() (tool mcp.Tool, handler server.ToolHandlerFunc) {
+func (n *noteTool) WriteNote() (tool mcp.Tool, handler server.ToolHandlerFunc) {
     // 传入三个参数，完整地址，内容以及写的方式（追加写 or 覆盖写）
     tool = mcp.NewTool(
         "WriteNoteByFullPath",
@@ -201,6 +201,7 @@ func (n *noteTool) WriteNoteByFullPath() (tool mcp.Tool, handler server.ToolHand
 
     handler = func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
         file_full_path, ok := request.Params.Arguments["file_full_path"].(string)
+
         if !ok || file_full_path == "" {
             return mcp.NewToolResultError("Param file_full_path is nil"), nil
         }
@@ -216,10 +217,8 @@ func (n *noteTool) WriteNoteByFullPath() (tool mcp.Tool, handler server.ToolHand
             mode = "append"
         }
         
-        // check path
-        if _, err := os.Stat(file_full_path); os.IsNotExist(err) {
-            // This server is written based on the existing file
-            return mcp.NewToolResultError("file not exist"), err
+        if !utils.CheckIsExist(file_full_path) {
+            return mcp.NewToolResultError("file not exist"), nil
         }
 
         switch mode{
@@ -274,14 +273,12 @@ func (n *noteTool) CreateANote() (tool mcp.Tool, handler server.ToolHandlerFunc)
     handler = func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
         target_file_path := request.Params.Arguments["target_file_path"].(string)
         
-        // check IllegalPath
-        if !filepath.HasPrefix(target_file_path, config.Cfg.Vault.Path) {
+        if utils.CheckIllegalPath(target_file_path) {
             return mcp.NewToolResultError("IllegalPath"), nil
         }
         
-        // check path exist
-        if _, err := os.Stat(target_file_path); err == nil {
-            return mcp.NewToolResultError("file already exist"), err
+        if utils.CheckIsExist(target_file_path) {
+            return mcp.NewToolResultError("file already exist"), nil
         }
 
         // CreateFile
@@ -312,22 +309,19 @@ func (n *noteTool) DeleteNote() (tool mcp.Tool, handler server.ToolHandlerFunc) 
 
     handler = func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
         target_file_path := request.Params.Arguments["target_file_path"].(string)
-
-        // check IllegalPath
-        if !strings.HasPrefix(target_file_path, config.Cfg.Vault.Path) {
+        
+        if utils.CheckIllegalPath(target_file_path) {
             return mcp.NewToolResultError("IllegalPath"), nil
         }
-        
-        // check is .md
-        if !strings.HasSuffix(target_file_path, ".md") {
+
+        if !utils.CheckIsMd(target_file_path) {
             return mcp.NewToolResultError("Not a markdown file"), nil
         }
-
-        // check path exist
-        if _, err := os.Stat(target_file_path); os.IsNotExist(err) {
+        
+        if !utils.CheckIsExist(target_file_path) {
             return mcp.NewToolResultError("File not exist"), nil
         }
-        
+
         // before delete note, need backup file
         if _, err := utils.Backupfile(target_file_path); err != nil {
             return mcp.NewToolResultError("Before delete file, failed to backup file"), err
@@ -359,11 +353,10 @@ func (n *noteTool) GetNoteList() (tool mcp.Tool, handler server.ToolHandlerFunc)
     handler = func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
         folder_path := request.Params.Arguments["folder_path"].(string)
 
-        // check IllegalPath
-        if !strings.HasPrefix(folder_path, config.Cfg.Vault.Path) {
-                return mcp.NewToolResultError("IllegalPath"), nil
+        if utils.CheckIllegalPath(folder_path) {
+            return mcp.NewToolResultError("IllegalPath"), nil
         }
-        
+
         fi, err := os.Stat(folder_path)
         if err != nil {
             return mcp.NewToolResultError("Folder not found"), nil
@@ -422,20 +415,17 @@ func (n *noteTool) MoveOneNote() (tool mcp.Tool, hander server.ToolHandlerFunc) 
         source_path, _ := request.Params.Arguments["source_path"].(string)
         target_path, _ := request.Params.Arguments["target_path"].(string)
         
-        // check is illegalPath
-        if !strings.HasPrefix(source_path, config.Cfg.Vault.Path) || !strings.HasPrefix(target_path, config.Cfg.Vault.Path) {
+        if utils.CheckIllegalPath(source_path) || utils.CheckIllegalPath(target_path) {
             return mcp.NewToolResultError("Sourcepath or targetpath is illegalPath"), nil
         }
-
-        // check is .md
-		if !strings.HasSuffix(source_path, ".md") || !strings.HasSuffix(target_path, ".md") {
+        
+        if !utils.CheckIsMd(source_path) {
 			return mcp.NewToolResultError("Only .md files can be moved"), nil
-		}
+        }
 
-        // check is exist
-		if _, err := os.Stat(source_path); os.IsNotExist(err) {
-			return mcp.NewToolResultError("Source file does not exist"), nil
-		}
+        if !utils.CheckIsExist(source_path) || utils.CheckIsExist(target_path) {
+			return mcp.NewToolResultError("Source filepath or target filepath maybe error"), nil
+        }
 
         // check target path is exist（if not exist, create it）
 		targetDir := filepath.Dir(target_path)
