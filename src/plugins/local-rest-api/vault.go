@@ -1,4 +1,4 @@
-package local_rest_api
+package api
 
 import (
 	"encoding/json"
@@ -27,13 +27,26 @@ func (l localRestApi) GetVaultFile(filename string) (details NoteDetails, err er
 	}
 
 	if code != http.StatusOK {
-		apiError := APIError{}
+		apiError := Error{}
 		if err = json.Unmarshal(respBody, &apiError); err == nil {
 			err = fmt.Errorf("ErrorCode: %d Error: %s", apiError.ErrorCode, apiError.Message)
 		}
 		return
 	}
 	err = json.Unmarshal(respBody, &details)
+	return
+}
+
+func (l localRestApi) GetVaultFileFrontmatter(filename string) (res map[string]interface{}, err error) {
+	noteDetail, err := l.GetVaultFile(fmt.Sprintf(filename))
+	if err != nil {
+		return
+	}
+	if noteDetail.Frontmatter == nil {
+		err = fmt.Errorf("no frontmatter found in file: %s", filename)
+		return
+	}
+	res = noteDetail.Frontmatter
 	return
 }
 
@@ -49,7 +62,7 @@ func (l localRestApi) DeleteVaultFile(filename string) (err error) {
 	}
 
 	if code != http.StatusNoContent {
-		apiError := APIError{}
+		apiError := Error{}
 		if err = json.Unmarshal(respBody, &apiError); err == nil {
 			return fmt.Errorf("ErrorCode: %d Error: %s", apiError.ErrorCode, apiError.Message)
 		}
@@ -71,7 +84,7 @@ func (l localRestApi) AppendVaultFile(filename string, content string) (err erro
 	}
 
 	if code != http.StatusNoContent {
-		apiError := APIError{}
+		apiError := Error{}
 		if err = json.Unmarshal(respBody, &apiError); err == nil {
 			return fmt.Errorf("ErrorCode: %d Error: %s", apiError.ErrorCode, apiError.Message)
 		}
@@ -94,7 +107,7 @@ func (l localRestApi) CreateOrUpdateVaultFile(filename string, content string) (
 	}
 
 	if code != http.StatusNoContent {
-		apiError := APIError{}
+		apiError := Error{}
 		if err = json.Unmarshal(respBody, &apiError); err == nil {
 			return fmt.Errorf("ErrorCode: %d Error: %s", apiError.ErrorCode, apiError.Message)
 		}
@@ -102,7 +115,7 @@ func (l localRestApi) CreateOrUpdateVaultFile(filename string, content string) (
 	return
 }
 
-func (l localRestApi) GetDirectory(path string) (res []string, err error) {
+func (l localRestApi) ListDirectory(path string) (res []string, err error) {
 	var url string
 	if path == "" || path == "/" {
 		url = l.BaseUrl + RootDirectoryRoute
@@ -117,7 +130,7 @@ func (l localRestApi) GetDirectory(path string) (res []string, err error) {
 		return
 	}
 	if code != http.StatusOK {
-		apiError := APIError{}
+		apiError := Error{}
 		if err = json.Unmarshal(respBody, &apiError); err == nil {
 			err = fmt.Errorf("ErrorCode: %d Error: %s", apiError.ErrorCode, apiError.Message)
 		}

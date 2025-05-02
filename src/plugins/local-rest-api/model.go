@@ -1,6 +1,6 @@
-package local_rest_api
+package api
 
-type APIError struct {
+type Error struct {
 	ErrorCode int    `json:"errorCode"`
 	Message   string `json:"message"`
 }

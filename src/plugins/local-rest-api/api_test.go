@@ -1,4 +1,4 @@
-package local_rest_api
+package api
 
 import (
 	"fmt"
@@ -69,7 +69,7 @@ func TestLocalRestApi_CreateOrUpdateVaultFile(t *testing.T) {
 
 func TestLocalRestApi_GetDirectory(t *testing.T) {
 	path := "Inbox"
-	directory, err := api.GetDirectory(path)
+	directory, err := api.ListDirectory(path)
 	if err != nil {
 		t.Errorf("Error getting directory: %v", err)
 		return

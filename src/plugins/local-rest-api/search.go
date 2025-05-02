@@ -1,4 +1,4 @@
-package local_rest_api
+package api
 
 import (
 	"encoding/json"
@@ -34,7 +34,7 @@ func (l localRestApi) SimpleSearch(query string, contextLength int) (searchResul
 	}
 
 	if code != http.StatusOK {
-		apiError := APIError{}
+		apiError := Error{}
 		if err = json.Unmarshal(respBody, &apiError); err == nil {
 			err = fmt.Errorf("ErrorCode: %d Error: %s", apiError.ErrorCode, apiError.Message)
 		}
