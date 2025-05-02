@@ -11,13 +11,12 @@ import (
 	"github.com/spf13/viper"
 )
 
-
-type VaultConfig struct{
-    Path string `mapstructure:"path"`
+type VaultConfig struct {
+	Path string `mapstructure:"path"`
 }
 
-type BackuoConfig struct {
-    Path string `mapstructure:"path"`
+type BackupConfig struct {
+	Path string `mapstructure:"path"`
 }
 
 type TemplateConfig struct {
@@ -41,26 +40,23 @@ type Config struct {
 var Cfg Config
 
 func InitConfig() {
-    
-    // dir, _ := os.Getwd()
-    _, filename, _, _ := runtime.Caller(0)
-    confPath := path.Dir(filename)
-    viper.AddConfigPath(confPath)
-    viper.SetConfigName("config")
-    viper.SetConfigType("yaml")
-    // viper.AddConfigPath("./src/config")
-    // viper.AddConfigPath(filepath.Join(dir, "src/config"))
 
-    if err := viper.ReadInConfig(); err != nil {
-        panic(fmt.Errorf("Fatal error loading config file: %w", err))
-    }
+	// dir, _ := os.Getwd()
+	_, filename, _, _ := runtime.Caller(0)
+	confPath := path.Dir(filename)
+	viper.AddConfigPath(confPath)
+	viper.SetConfigName("config-dev")
+	viper.SetConfigType("yaml")
+	// viper.AddConfigPath("./src/config")
+	// viper.AddConfigPath(filepath.Join(dir, "src/config"))
 
-    if err := viper.Unmarshal(&Cfg); err != nil {
-        panic(fmt.Errorf("Unable to decode config into struct: %w", err))
-    }
+	if err := viper.ReadInConfig(); err != nil {
+		panic(fmt.Errorf("Fatal error loading config file: %w", err))
+	}
 
-    fmt.Println("Config loaded successfully")
+	if err := viper.Unmarshal(&Cfg); err != nil {
+		panic(fmt.Errorf("Unable to decode config into struct: %w", err))
+	}
+
+	fmt.Println("Config loaded successfully")
 }
-
-
-
