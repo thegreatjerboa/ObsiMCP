@@ -3,3 +3,11 @@ vault:
 
 backup:
   path: "your backup dir"
+
+template:
+  path: "your template dir"
+
+plugins:
+  rest-api:
+    url: "http://your obsidian vault url"
+    token: "your obsidian vault token"

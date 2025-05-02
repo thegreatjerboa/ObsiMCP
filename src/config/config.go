@@ -20,9 +20,22 @@ type BackuoConfig struct {
     Path string `mapstructure:"path"`
 }
 
-type Config struct{
-    Vault VaultConfig `mapstructure:"vault"`
-    Backup BackuoConfig `mapstructure:"backup"`
+type TemplateConfig struct {
+	Path string `mapstructure:"path"`
+}
+
+type PluginsConfig struct {
+	Rest struct {
+		BaseUrl   string `mapstructure:"base_url"`
+		AuthToken string `mapstructure:"auth_token"`
+	} `mapstructure:"rest_api"`
+}
+
+type Config struct {
+	Vault    VaultConfig    `mapstructure:"vault"`
+	Backup   BackupConfig   `mapstructure:"backup"`
+	Template TemplateConfig `mapstructure:"template"`
+	Plugins  PluginsConfig  `mapstructure:"plugins"`
 }
 
 var Cfg Config
