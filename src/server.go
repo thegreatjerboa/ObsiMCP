@@ -1,6 +1,7 @@
 package server
 
 import (
+	"obsimcp/src/config"
 	"obsimcp/src/tools"
 
 	"github.com/mark3labs/mcp-go/server"
@@ -39,8 +40,11 @@ func CreateServer() *server.MCPServer {
 	s.AddTool(metatools.AddFrontmatter())
 	s.AddTool(metatools.GetNoteTags())
 
-	templateTools := tools.NewTemplateTools()
-	s.AddTool(templateTools.ListTemplates())
+	// template tools (only available when REST API is configured)
+	if config.Cfg.Plugins.Rest.BaseUrl != "" {
+		templateTools := tools.NewTemplateTools()
+		s.AddTool(templateTools.ListTemplates())
+	}
 
 	return s
 }

@@ -3,3 +3,4 @@ src/config/config-dev.yaml
 .vscode/
 .DS_Store
 main
+.claude/settings.local.json

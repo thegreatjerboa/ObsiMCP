@@ -32,10 +32,14 @@ func (t templateTools) ListTemplates() (tool mcp.Tool, handler server.ToolHandle
 
 	tool = mcp.NewTool(
 		"ListTemplates",
-		mcp.WithDescription(`List all templates in obsidian template folder.\ 
+		mcp.WithDescription(`List all templates in obsidian template folder.\
 								it return template's name and description`),
 	)
 	handler = func(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+		// Check if REST API client is available
+		if api.Client == nil {
+			return mcp.NewToolResultError("Template listing requires Obsidian Local REST API plugin - not configured"), nil
+		}
 		items, err := api.Client.ListDirectory(config.Cfg.Template.Path)
 		if err != nil {
 			return mcp.NewToolResultError(

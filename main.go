@@ -10,10 +10,15 @@ import (
 func main() {
 	// InitConfig
 	config.InitConfig()
-	err := api.InitLocalRestApi()
-	if err != nil {
-		fmt.Printf("Error initializing local REST API: %v\n", err)
-		return
+
+	// Initialize REST API client only if configured
+	// (optional - enables template tools via Obsidian Local REST API plugin)
+	if config.Cfg.Plugins.Rest.BaseUrl != "" {
+		err := api.InitLocalRestApi()
+		if err != nil {
+			fmt.Printf("Warning: Local REST API not available: %v\n", err)
+			// Continue without REST API - basic tools will still work
+		}
 	}
 
 	// create server
